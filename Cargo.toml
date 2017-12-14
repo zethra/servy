@@ -1,0 +1,6 @@
+[package]
+name = "servy"
+version = "0.1.0"
+authors = ["zethra <jediben97@gmail.com>"]
+
+[dependencies]
