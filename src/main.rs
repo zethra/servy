@@ -56,6 +56,7 @@ impl Service for Server {
 </head>
 <body>
     <h1>Directory listing</h1>
+    <hr/>
     <ul>
 "#);
                     for item in dir {
@@ -78,6 +79,7 @@ impl Service for Server {
                     }
                     page.push_str(r#"
     </ul>
+    <hr/>
 </body>
 </html>
                     "#);
