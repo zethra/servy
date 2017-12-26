@@ -27,7 +27,6 @@ impl Service for Server {
         let mut resp = Response::new();
         let path_str = ".".to_string() + request.path();
         let path = Path::new(&path_str);
-        println!("current path: {:?}", path);
         if path.is_dir() {
             match path.read_dir() {
                 Ok(dir) => {
@@ -44,12 +43,9 @@ impl Service for Server {
                     for item in dir {
                         match item {
                             Ok(item) => {
-                                println!("item: {:?}", item);
                                 let path = item.path();
-                                println!("path: {:?}", path);
                                 let mut path_str = path.to_string_lossy().to_string();
                                 path_str.remove(0);
-                                println!("path_str: {:?}", path_str);
                                 let name = item.file_name();
                                 let mut name_str = name.to_string_lossy().to_string();
                                 if path.is_dir() {
