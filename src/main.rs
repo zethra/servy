@@ -1,3 +1,7 @@
+#[macro_use]
+extern crate clap;
+#[macro_use]
+extern crate lazy_static;
 extern crate futures;
 extern crate tokio_minihttp;
 extern crate tokio_proto;
@@ -9,10 +13,22 @@ use std::io::BufReader;
 use std::io::prelude::*;
 use std::path::Path;
 
+use clap::ArgMatches;
 use futures::future;
 use tokio_minihttp::{Request, Response, Http};
 use tokio_proto::TcpServer;
 use tokio_service::Service;
+
+lazy_static! {
+    static ref MATCHES: ArgMatches<'static> = clap_app!(servy =>
+            (version: "0.1.0")
+            (author: "Ben Goldberg <benaagoldberg@gmail.com>")
+            (about: "A tiny file server")
+            (@arg verbose: -v --verbose "Verbose output")
+            (@arg host: -h --host +takes_value "Host string the web server should use ie. 0.0.0.0")
+            (@arg port: -p --port +takes_value "The port web server should use ie. 8000")
+        ).get_matches();
+}
 
 struct Server;
 
@@ -23,7 +39,9 @@ impl Service for Server {
     type Future = future::Ok<Response, io::Error>;
 
     fn call(&self, request: Request) -> Self::Future {
-//        println!("path: {}", request.path());
+        if MATCHES.is_present("verbose") {
+            println!("{} {}", request.method(), request.path());
+        }
         let mut resp = Response::new();
         let path_str = ".".to_string() + request.path();
         let path = Path::new(&path_str);
@@ -93,8 +111,23 @@ impl Service for Server {
 }
 
 fn main() {
-    let addr = "[::1]:8000".parse().unwrap();
-    println!("Starting server on http://[::1]:8000");
+    let host = match MATCHES.value_of("host") {
+        Some(value) => value,
+        None => "[::1]"
+    };
+    let port = match MATCHES.value_of("port") {
+        Some(value) => value,
+        None => "8000"
+    };
+    let addr_str = host.to_string() + ":" + port;
+    let addr = match addr_str.as_str().parse() {
+        Ok(addr) => addr,
+        Err(_) => {
+            println!("Invalid host or port");
+            return;
+        }
+    };
+    println!("Starting server on http://{}", addr_str);
     TcpServer::new(Http, addr)
         .serve(|| Ok(Server));
 }

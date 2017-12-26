@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["zethra <jediben97@gmail.com>"]
 
 [dependencies]
+lazy_static = "1.0.0"
+clap = "2.29.0"
 futures = "0.1.17"
 tokio-proto = "0.1.1"
 tokio-service = "0.1.0"
