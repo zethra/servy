@@ -22,8 +22,8 @@ use tokio_service::Service;
 lazy_static! {
     static ref MATCHES: ArgMatches<'static> = clap_app!(servy =>
             (version: "0.1.0")
-            (author: "Ben Goldberg <benaagoldberg@gmail.com>")
-            (about: "A tiny file server")
+            (author: "Ben Goldberg <jediben97@gmail.com>")
+            (about: "A tiny little web server")
             (@arg verbose: -v --verbose "Verbose output")
             (@arg host: -h --host +takes_value "Host string the web server should use ie. 0.0.0.0")
             (@arg port: -p --port +takes_value "The port web server should use ie. 8000")
