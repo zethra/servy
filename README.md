@@ -3,6 +3,7 @@
 #### A tiny little web server
 
 [![Build Status](https://www.travis-ci.org/zethra/servy.svg?branch=master)](https://www.travis-ci.org/zethra/servy)
+[![Build status](https://ci.appveyor.com/api/projects/status/oma6cbwvfl350cof?svg=true)](https://ci.appveyor.com/project/zethra/servy)
 
 ## What is servy?
 
