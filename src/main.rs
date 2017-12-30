@@ -42,26 +42,30 @@ impl Service for Server {
         if MATCHES.is_present("verbose") {
             println!("{} {}", request.method(), request.path());
         }
-        let mut resp = Response::new();
         let path_str = ".".to_string() + request.path();
         let path = Path::new(&path_str);
+        future::ok(serve_file(path))
+    }
+}
 
-        let file = match File::open(path) {
-            Ok(file) => file,
-            Err(_) => {
-                resp.status_code(404, "File not found");
-                resp.body("File not found");
-                return future::ok(resp);
-            }
-        };
-        let mut buf_reader = BufReader::new(file);
-        let mut content = Vec::new();
-        if let Err(e) = buf_reader.read_to_end(&mut content) {
-            if path.is_dir() {
-                match path.read_dir() {
-                    Ok(dir) => {
-                        let mut page = String::new();
-                        page.push_str(r#"
+fn serve_file(path: &Path) -> Response {
+    let mut resp = Response::new();
+    let file = match File::open(path) {
+        Ok(file) => file,
+        Err(_) => {
+            resp.status_code(404, "File not found");
+            resp.body("File not found");
+            return resp;
+        }
+    };
+    let mut buf_reader = BufReader::new(file);
+    let mut content = Vec::new();
+    if let Err(e) = buf_reader.read_to_end(&mut content) {
+        if path.is_dir() {
+            match path.read_dir() {
+                Ok(dir) => {
+                    let mut page = String::new();
+                    page.push_str(r#"
 <html>
 <head>
     <title>Directory listing</title>
@@ -71,47 +75,50 @@ impl Service for Server {
     <hr/>
     <ul>
 "#);
-                        for item in dir {
-                            match item {
-                                Ok(item) => {
-                                    let path = item.path();
-                                    let mut path_str = path.to_string_lossy().to_string();
-                                    path_str.remove(0);
-                                    let name = item.file_name();
-                                    let mut name_str = name.to_string_lossy().to_string();
-                                    if path.is_dir() {
-                                        name_str.push('/');
-                                    }
-                                    page.push_str(format!("\t\t<li><a href=\"{}\">{}</a></li>\n", path_str, name_str).as_str());
+                    for item in dir {
+                        match item {
+                            Ok(item) => {
+                                let path = item.path();
+                                let mut path_str = path.to_string_lossy().to_string();
+                                path_str.remove(0);
+                                let name = item.file_name();
+                                let mut name_str = name.to_string_lossy().to_string();
+                                if name_str == "index.html" || name_str == "index.htm" {
+                                    return serve_file(path.as_path())
                                 }
-                                Err(e) => {
-                                    println!("{}", e);
+                                if path.is_dir() {
+                                    name_str.push('/');
                                 }
+                                page.push_str(format!("\t\t<li><a href=\"{}\">{}</a></li>\n", path_str, name_str).as_str());
+                            }
+                            Err(e) => {
+                                println!("{}", e);
                             }
                         }
-                        page.push_str(r#"
+                    }
+                    page.push_str(r#"
     </ul>
     <hr/>
 </body>
 </html>
                     "#);
-                        resp.body(page.as_str());
-                        return future::ok(resp);
-                    }
-                    Err(e) => {
-                        println!("{}", e);
-                    }
+                    resp.body(page.as_str());
+                    return resp;
+                }
+                Err(e) => {
+                    println!("{}", e);
                 }
             }
-            resp.status_code(500, "Internal error");
-            resp.body("Internal error");
-            println!("{}", e);
-            return future::ok(resp);
         }
-        resp.body_bytes(content.as_slice());
-        future::ok(resp)
+        resp.status_code(500, "Internal error");
+        resp.body("Internal error");
+        println!("{}", e);
+        return resp;
     }
+    resp.body_bytes(content.as_slice());
+    resp
 }
+
 
 fn main() {
     let host = match MATCHES.value_of("host") {
