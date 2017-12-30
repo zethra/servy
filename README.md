@@ -2,6 +2,8 @@
 
 #### A tiny little web server
 
+[![Build Status](https://www.travis-ci.org/zethra/servy.svg?branch=master)](https://www.travis-ci.org/zethra/servy)
+
 ## What is servy?
 
 Well it's a little tiny web server written in rust.  
