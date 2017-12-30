@@ -7,8 +7,8 @@
 
 ## What is servy?
 
-Well it's a little tiny web server written in rust.  
-It's a single binary with only a few flag meant to be analogous to `python -m http.server`
+Well it's a tiny little web server written in rust.  
+It's a single binary with only a few flags meant to be analogous to `python -m http.server`
 
 ### Important Note
 By default servy starts on the ipv6 interface by using the host string `[::1]`
@@ -39,8 +39,7 @@ Print the help message
 ## Stuff inside
 
 Servy in built on top of tokio-minihttp.  I like it because it's small and simple, like servy.
-It is currently using a fork of tokio-minihttp because it stores the responses as strings, and
-as rust requires all strings to be valid UTF-8 I could only server text files.  I forked tokio-minihttp
+I'm currently using a fork of tokio-minihttp because the master version stores the response body in the response struct as strings, and as rust requires all strings to be valid UTF-8 I could only server text files.  I forked tokio-minihttp
 and modified it to store responses as bytes and am waiting on my pull request to be merged (fingers crossed).
 
 ## Benchmarks (cuz why not)
