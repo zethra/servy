@@ -7,7 +7,4 @@ authors = ["zethra <jediben97@gmail.com>"]
 lazy_static = "1.0.0"
 clap = "2.29.0"
 futures = "0.1.17"
-tokio-proto = "0.1.1"
-tokio-service = "0.1.0"
-#tokio-minihttp = { git = "https://github.com/tokio-rs/tokio-minihttp"}
-tokio-minihttp = { git = "https://github.com/zethra/tokio-minihttp" }
+hyper = "0.11.10"
