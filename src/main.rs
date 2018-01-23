@@ -112,7 +112,9 @@ fn serve_file(path: &Path) -> Response {
             .with_status(StatusCode::InternalServerError)
             .with_body("Internal error");
     }
-    Response::new().with_body(content)
+    Response::new()
+        .with_header(ContentLength(content.len() as u64))
+        .with_body(content)
 }
 
 

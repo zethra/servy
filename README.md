@@ -38,10 +38,8 @@ Print the help message
 
 ## Stuff inside
 
-Servy in built on top of tokio-minihttp.  I like it because it's small and simple, like servy.
-It is currently using a fork of tokio-minihttp because it stores the responses as strings, and
-as rust requires all strings to be valid UTF-8 I could only server text files.  I forked tokio-minihttp
-and modified it to store responses as bytes and am waiting on my pull request to be merged (fingers crossed).
+Servy in built on top of hyper.  I like it because it's small and simple, 
+compared to larger frameworks, without being unwieldy.
 
 ## Benchmarks (cuz why not)
 
@@ -53,11 +51,11 @@ I get
 Running 10s test @ http://[::1]:8000/Cargo.toml
   20 threads and 200 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     1.56ms  209.60us   5.71ms   89.90%
-    Req/Sec     6.46k     1.23k   28.10k    99.06%
-  1297370 requests in 10.10s, 540.69MB read
-Requests/sec: 128459.00
-Transfer/sec:     53.54MB
+    Latency     1.87ms    1.20ms 205.06ms   99.30%
+    Req/Sec     5.40k   449.11    11.21k    93.31%
+  1084315 requests in 10.10s, 261.62MB read
+Requests/sec: 107361.59
+Transfer/sec:     25.90MB
 ```
 
 For comparision running the same test on `python -m http.server` on Python 3.6.4
