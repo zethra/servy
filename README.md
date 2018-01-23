@@ -7,8 +7,8 @@
 
 ## What is servy?
 
-Well it's a little tiny web server written in rust.  
-It's a single binary with only a few flag meant to be analogous to `python -m http.server`
+Well it's a tiny little web server written in rust.  
+It's a single binary with only a few flags meant to be analogous to `python -m http.server`
 
 ### Important Note
 By default servy starts on the ipv6 interface by using the host string `[::1]`
