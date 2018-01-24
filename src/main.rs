@@ -135,8 +135,7 @@ fn main() {
             return;
         }
     };
-    let mut server = Http::new().bind(&addr, || Ok(Servy)).unwrap();
-    server.no_proto();
+    let server = Http::new().bind(&addr, || Ok(Servy)).unwrap();
     println!("Starting server on http://{}", server.local_addr().unwrap());
     server.run().unwrap();
 }
