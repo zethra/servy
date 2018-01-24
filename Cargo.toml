@@ -2,6 +2,17 @@
 name = "servy"
 version = "0.2.0"
 authors = ["zethra <jediben97@gmail.com>"]
+description = "A tiny little web server"
+homepage = "https://github.com/zethra/servy"
+repository = "https://github.com/zethra/servy"
+readme = "README.md"
+keywords = ["web", "server", "hyper", "tokio", "tiny"]
+categories = ["command-line-utilities"]
+license = "Apache-2.0/MIT"
+
+[badges]
+appveyor = { repository = "zethra/servy", branch = "master", service = "github" }
+travis-ci = { repository = "zethra/servy", branch = "master" }
 
 [dependencies]
 lazy_static = "1.0.0"
