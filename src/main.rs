@@ -9,10 +9,15 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::path::Path;
+use std::fs::metadata;
+use std::thread;
 
 use clap::ArgMatches;
-use futures::future::FutureResult;
-use hyper::StatusCode;
+use futures::future::ok;
+use futures::future::Future;
+use futures::sync::{mpsc, oneshot};
+use futures::sink::Sink;
+use hyper::{Chunk, StatusCode};
 use hyper::header::ContentLength;
 use hyper::server::{Http, Service, Request, Response};
 
@@ -33,15 +38,68 @@ impl Service for Servy {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;
-    type Future = FutureResult<Response, hyper::Error>;
+    type Future = Box<Future<Item=Self::Response, Error=Self::Error>>;
 
     fn call(&self, request: Request) -> Self::Future {
         if MATCHES.is_present("verbose") {
             println!("{} {}", request.method(), request.path());
         }
         let path_str = ".".to_string() + request.path();
-        let path = Path::new(&path_str);
-        futures::future::ok(serve_file(path))
+        let path = Path::new(path_str.as_str()).to_owned();
+        let data = match metadata(&path) { 
+            Ok(data) => data,
+            Err(_) => {
+                return Box::new(ok(Response::new()
+                           .with_status(StatusCode::NotFound)
+                           .with_body("File not found")));
+            }
+        };
+        if data.len() < 1000000 {
+            Box::new(ok(serve_file(&path)))
+        } else { 
+            let (tx, rx) = oneshot::channel();
+            thread::spawn(move || {
+                let mut file = match File::open(path) {
+                    Ok(file) => file,
+                    Err(_) => {
+                        tx.send(Response::new()
+                            .with_status(StatusCode::NotFound)
+                            .with_body("File not found"))
+                        .expect("Send error on open");
+                        return;
+                    }
+                };
+                let (mut tx_body, rx_body) = mpsc::channel(1);
+                let resp = Response::new()
+                    .with_header(ContentLength(data.len()))
+                    .with_body(rx_body);
+                tx.send(resp).expect("Send error on successful file read");
+                let mut buf = [0u8; 16];
+                loop {
+                    match file.read(&mut buf) {
+                        Ok(n) => {
+                            if n == 0 {
+                                tx_body.close().expect("panic closing");
+                                break;
+                            } else {
+                                let chunk: Chunk = buf[0..n].to_vec().into();
+                                match tx_body.send(Ok(chunk)).wait() {
+                                    Ok(t) => { tx_body = t }
+                                    Err(_) => { 
+                                        break;
+                                    }
+                                };
+                            }
+                        },
+                        Err(_) => { 
+                            break;
+                        }
+                    }
+                }
+            });
+
+            Box::new(rx.map_err(|e| hyper::Error::from(std::io::Error::new(std::io::ErrorKind::Other, e))))
+        }
     }
 }
 
