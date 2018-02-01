@@ -20,6 +20,10 @@ If you want to start it on the ipv4 interface use a ipv4 host string (see below)
 
 Start a web server on port 8000
 
+`servy my/dir`
+
+Start a web server using `my/dir` as root directory
+
 `servy -p 8080`
 
 Start servy on port 8080
