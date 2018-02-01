@@ -21,6 +21,7 @@ lazy_static! {
             (version: "0.1.0")
             (author: "Ben Goldberg <jediben97@gmail.com>")
             (about: "A tiny little web server")
+            (@arg DIR: +takes_value "Directory to serve from")
             (@arg verbose: -v --verbose "Verbose output")
             (@arg host: -h --host +takes_value "Host string the web server should use ie. 0.0.0.0")
             (@arg port: -p --port +takes_value "The port web server should use ie. 8000")
@@ -135,6 +136,12 @@ fn main() {
             return;
         }
     };
+    match MATCHES.value_of("DIR") {
+        Some(dir) => {
+            assert!(std::env::set_current_dir(dir).is_ok());
+        }
+        None => {}
+    }
     let server = Http::new().bind(&addr, || Ok(Servy)).unwrap();
     println!("Starting server on http://{}", server.local_addr().unwrap());
     server.run().unwrap();
