@@ -1,6 +1,6 @@
 [package]
 name = "servy"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["zethra <jediben97@gmail.com>"]
 description = "A tiny little web server"
 homepage = "https://github.com/zethra/servy"
