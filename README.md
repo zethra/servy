@@ -5,6 +5,9 @@
 [![Build Status](https://www.travis-ci.org/zethra/servy.svg?branch=master)](https://www.travis-ci.org/zethra/servy)
 [![Build status](https://ci.appveyor.com/api/projects/status/oma6cbwvfl350cof?svg=true)](https://ci.appveyor.com/project/zethra/servy)
 
+[crate-version-badge]:  https://img.shields.io/crates/v/servy.svg
+[docs.rs-badge]:        https://docs.rs/servy/badge.svg
+
 ## What is servy?
 
 Well it's a tiny little web server written in rust.  
