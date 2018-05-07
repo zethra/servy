@@ -18,7 +18,7 @@ use hyper::server::{Http, Service, Request, Response};
 
 lazy_static! {
     static ref MATCHES: ArgMatches<'static> = clap_app!(servy =>
-            (version: "0.1.0")
+            (version: "1.0.0")
             (author: "Ben Goldberg <jediben97@gmail.com>")
             (about: "A tiny little web server")
             (@arg DIR: +takes_value "Directory to serve from")
