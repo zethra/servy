@@ -19,3 +19,6 @@ lazy_static = "1.0.0"
 clap = "2.29.0"
 futures = "0.1.17"
 hyper = "0.11.10"
+
+[profile.release]
+lto = true

@@ -80,7 +80,7 @@ fn serve_file(path: &Path) -> Response {
                                 path_str.remove(0);
                                 let name = item.file_name();
                                 let mut name_str = name.to_string_lossy().to_string();
-                                if name_str == "index.html" || name_str == "index.htm" {
+                                if name_str.starts_with("index") {
                                     return serve_file(path.as_path());
                                 }
                                 if path.is_dir() {
