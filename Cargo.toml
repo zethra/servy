@@ -1,6 +1,7 @@
 [package]
 name = "servy"
-version = "1.0.0"
+version = "2.0.0"
+edition = "2018"
 authors = ["zethra <jediben97@gmail.com>"]
 description = "A tiny little web server"
 homepage = "https://github.com/zethra/servy"
@@ -15,10 +16,14 @@ appveyor = { repository = "zethra/servy", branch = "master", service = "github" 
 travis-ci = { repository = "zethra/servy", branch = "master" }
 
 [dependencies]
-lazy_static = "1.0.0"
-clap = "2.29.0"
-futures = "0.1.17"
-hyper = "0.11.10"
+smol = "0.1"
+anyhow = "1.0"
+async-h1 = "1.1"
+futures = "0.3"
+num_cpus = "1.13"
+piper = "0.1"
+async-native-tls = "0.3"
+http-types = "1.2"
 
 [profile.release]
 lto = true
