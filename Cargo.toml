@@ -1,29 +1,37 @@
 [package]
-name = "servy"
-version = "2.0.0"
-edition = "2018"
 authors = ["zethra <jediben97@gmail.com>"]
-description = "A tiny little web server"
-homepage = "https://github.com/zethra/servy"
-repository = "https://github.com/zethra/servy"
-readme = "README.md"
-keywords = ["web", "server", "hyper", "tokio", "tiny"]
 categories = ["command-line-utilities"]
+description = "A tiny little web server"
+edition = "2018"
+homepage = "https://github.com/zethra/servy"
+keywords = ["web", "server", "hyper", "tokio", "tiny"]
 license = "Apache-2.0/MIT"
-
+name = "servy"
+readme = "README.md"
+repository = "https://github.com/zethra/servy"
+version = "2.0.0"
 [badges]
-appveyor = { repository = "zethra/servy", branch = "master", service = "github" }
-travis-ci = { repository = "zethra/servy", branch = "master" }
+[badges.appveyor]
+branch = "master"
+repository = "zethra/servy"
+service = "github"
+
+[badges.travis-ci]
+branch = "master"
+repository = "zethra/servy"
 
 [dependencies]
-smol = "0.1"
 anyhow = "1.0"
 async-h1 = "1.1"
+async-native-tls = "0.3"
+async-std = { version = "1.5", default-features = false }
 futures = "0.3"
+futures-io = "0.3"
+http-types = "1.2"
 num_cpus = "1.13"
 piper = "0.1"
-async-native-tls = "0.3"
-http-types = "1.2"
+smol = "0.1"
 
+[profile]
 [profile.release]
 lto = true

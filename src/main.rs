@@ -1,21 +1,31 @@
-
+use std::fs::File;
 use std::net::TcpListener;
-use std::thread;
+use std::{path::Path, thread};
 
 use anyhow::Result;
 use async_native_tls::{Identity, TlsAcceptor};
+use async_std::io::BufReader;
 use futures::prelude::*;
-use http_types::{Request, Response, StatusCode};
+use http_types::{Body, Request, Response, StatusCode};
 use piper::{Arc, Mutex};
-use smol::{Async, Task};
+use smol::{blocking, reader, Async, Task};
 
 /// Serves a request and returns a response.
 async fn serve(req: Request) -> http_types::Result<Response> {
     // println!("Serving {}", req.url());
 
+    let file_path = Path::new(".").join(&req.url().path()[1..]);
+    // dbg!(&file_path);
+
+    let file = blocking!(File::open(&file_path))?;
+    // let file_len = blocking!(file.metadata())?.len();
+    let file_reader = BufReader::new(Mutex::new(reader(file)));
+
+    let body = Body::from_reader(Box::new(file_reader), None);
+
     let mut res = Response::new(StatusCode::Ok);
-    res.insert_header("Content-Type", "text/plain")?;
-    res.set_body("Hello from async-h1!");
+    // res.insert_header("Content-Type", "text/plain")?;
+    res.set_body(body);
     Ok(res)
 }
 
@@ -37,14 +47,22 @@ async fn listen(listener: Async<TcpListener>, tls: Option<TlsAcceptor>) -> Resul
         let task = match &tls {
             None => {
                 let stream = Arc::new(stream);
-                Task::spawn(async move { async_h1::accept(&host, stream, serve).await })
+                Task::spawn(async move {
+                    if let Err(err) = async_h1::accept(&host, stream, serve).await {
+                        println!("Connection error: {:#?}", err);
+                    }
+                })
             }
             Some(tls) => {
                 // In case of HTTPS, establish a secure TLS connection first.
                 match tls.accept(stream).await {
                     Ok(stream) => {
                         let stream = Arc::new(Mutex::new(stream));
-                        Task::spawn(async move { async_h1::accept(&host, stream, serve).await })
+                        Task::spawn(async move {
+                            if let Err(err) = async_h1::accept(&host, stream, serve).await {
+                                println!("Connection error: {:#?}", err);
+                            }
+                        })
                     }
                     Err(err) => {
                         println!("Failed to establish secure TLS connection: {:#?}", err);
@@ -55,7 +73,7 @@ async fn listen(listener: Async<TcpListener>, tls: Option<TlsAcceptor>) -> Resul
         };
 
         // Detach the task to let it run in the background.
-        task.unwrap().detach();
+        task.detach();
     }
 }
 
